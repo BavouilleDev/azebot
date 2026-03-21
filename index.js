@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { Client, GatewayIntentBits, Events } = require("discord.js");
+const { Client, GatewayIntentBits, Events, ActivityType } = require("discord.js");
 const { registerSlashCommands } = require("./src/registerCommands");
 const { handleInteraction } = require("./src/interactions");
 const { AzeSessionManager } = require("./src/sessionManager");
@@ -28,6 +28,7 @@ client.on(Events.InteractionCreate, (interaction) => {
 
 client.once(Events.ClientReady, async () => {
   console.log(`AzeBot connecté : ${client.user.tag}`);
+  client.user.setActivity("répondre Aze", { type: ActivityType.Playing });
   await registerSlashCommands(client);
 });
 
