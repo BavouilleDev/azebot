@@ -28,7 +28,7 @@ client.on(Events.InteractionCreate, (interaction) => {
 
 client.once(Events.ClientReady, async () => {
   console.log(`AzeBot connecté : ${client.user.tag}`);
-  client.user.setActivity("répondre Aze", { type: ActivityType.Playing });
+  client.user.setActivity("AZEEEE", { type: ActivityType.Playing });
   await registerSlashCommands(client);
 });
 

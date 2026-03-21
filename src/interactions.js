@@ -225,7 +225,7 @@ async function handleAzescanButton(interaction) {
 
   const input = new TextInputBuilder()
     .setCustomId("azescan_channel_input")
-    .setLabel("ID du salon (clic droit → Copier l'identifiant)")
+    .setLabel("Identifiant du salon (mode développeur)")
     .setStyle(TextInputStyle.Short)
     .setRequired(true)
     .setMinLength(17)
