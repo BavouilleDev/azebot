@@ -12,6 +12,7 @@ const {
   getLeaderboard,
   getUserStats,
   getGlobalStats,
+  getMonitoredChannel,
   setMonitoredChannel,
   replaceGuildRecords,
 } = require("./database");
@@ -167,6 +168,73 @@ async function handleAzeGlobal(interaction, client) {
     .setTimestamp();
 
   await interaction.editReply({ embeds: [embed] });
+}
+
+/**
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
+ */
+/**
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
+ */
+async function handleAzescanInfo(interaction) {
+  if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+    await interaction.reply({
+      content: "Réservé aux administrateurs.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const guild = interaction.guild;
+  if (!guild) {
+    await interaction.reply({
+      content: "Cette commande ne fonctionne qu'en serveur.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  if (!AUTO_BOT_USER_ID) {
+    await interaction.reply({
+      content:
+        "Variable **AUTO_BOT_USER_ID** absente du `.env` : le bot de début de session n'est pas configuré.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const channelId = getMonitoredChannel(guild.id);
+  if (!channelId) {
+    await interaction.reply({
+      content:
+        "Aucun salon surveillé pour ce serveur. Utilisez `/azescan` pour en définir un.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const channelUrl = `https://discord.com/channels/${guild.id}/${channelId}`;
+  let salonLine = `<#${channelId}>`;
+  try {
+    const ch = await guild.channels.fetch(channelId);
+    if (ch && "name" in ch) {
+      salonLine = `**#${ch.name}** — ${salonLine}`;
+    }
+  } catch {
+    /* salon supprimé ou inaccessible */
+  }
+
+  const embed = new EmbedBuilder()
+    .setColor(0x5865f2)
+    .setTitle("Surveillance Aze — configuration")
+    .setDescription(
+      `**Bot dont les messages démarrent une session :** <@${AUTO_BOT_USER_ID}>\n\n` +
+        `**Salon surveillé :** ${salonLine}\n` +
+        `[Lien direct vers le salon](${channelUrl})`,
+    )
+    .setTimestamp();
+
+  await interaction.reply({ embeds: [embed], ephemeral: true });
 }
 
 /**
@@ -368,6 +436,9 @@ async function handleInteraction(interaction, client) {
           return;
         case "azescan":
           await handleAzescanCommand(interaction);
+          return;
+        case "azescaninfo":
+          await handleAzescanInfo(interaction);
           return;
         default:
           return;

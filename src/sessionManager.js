@@ -71,6 +71,9 @@ class AzeSessionManager {
   onAutoMessage(message) {
     const st = this._getOrCreate(message.channel.id);
     st.resetFromAuto(message.createdTimestamp);
+    console.log(
+      `[AzeBot] Message auto détecté — nouvelle session · salon ${message.channel.id} · guilde ${message.guildId} · msg ${message.id}`,
+    );
   }
 
   /**
@@ -125,6 +128,11 @@ class AzeSessionManager {
     });
 
     st.lastAzeTs = ts;
+
+    console.log(
+      `[AzeBot] AZE compté — ${message.author.tag} · rang ${rank} · ${points} pts · "${keyword}" · msg ${message.id}`,
+    );
+    process.stdout.write("\x07");
 
     await this._addMedalReactions(message, rank, message.guild);
   }

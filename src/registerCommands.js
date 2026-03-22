@@ -25,6 +25,13 @@ const commands = [
       "[Admin] Scanner l'historique d'un salon et activer la surveillance",
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+
+  new SlashCommandBuilder()
+    .setName("azescaninfo")
+    .setDescription(
+      "[Admin] Voir le bot écouté et le salon surveillé",
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ];
 
 /**

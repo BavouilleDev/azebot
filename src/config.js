@@ -14,8 +14,8 @@ const AUTO_BOT_USER_ID = process.env.AUTO_BOT_USER_ID || "";
 const CUSTOM_AZE_EMOJI_ID =
   process.env.CUSTOM_AZE_EMOJI_ID || "REMPLACER_PAR_ID_EMOJI_SERVEUR";
 
-/** Délai d'inactivité (ms) après le dernier message "aze" valide avant fin de session */
-const SESSION_INACTIVITY_MS = 30 * 60 * 1000;
+/** Délai d'inactivité (ms) après le dernier message "aze" valide avant fin de session (2 h) */
+const SESSION_INACTIVITY_MS = 2 * 60 * 60 * 1000;
 
 /** Mots-clés exacts (comparaison insensible à la casse, trim) */
 const AZE_KEYWORDS = new Set(["aze", "eza", "bvaze"]);
