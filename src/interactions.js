@@ -24,6 +24,8 @@ const {
   endOfLocalDayExclusiveMs,
   startOfLocalMonthMs,
   endOfLocalMonthExclusiveMs,
+  startOfLocalWeekMs,
+  endOfLocalWeekExclusiveMs,
 } = require("./timeUtils");
 
 const SNOWFLAKE_RE = /^\d{17,20}$/;
@@ -145,10 +147,26 @@ async function handleAzeGlobal(interaction, client) {
 
   const dayStart = startOfLocalDayMs();
   const dayEnd = endOfLocalDayExclusiveMs();
+  const weekStart = startOfLocalWeekMs();
+  const weekEnd = endOfLocalWeekExclusiveMs();
   const monthStart = startOfLocalMonthMs();
   const monthEnd = endOfLocalMonthExclusiveMs();
 
-  const g = getGlobalStats(guildId, monthStart, monthEnd, dayStart, dayEnd);
+  const g = getGlobalStats(
+    guildId,
+    monthStart,
+    monthEnd,
+    weekStart,
+    weekEnd,
+    dayStart,
+    dayEnd,
+  );
+
+  let mvpWeekLine = "_Aucun MVP cette semaine._";
+  if (g.mvpWeekUserId && g.mvpWeekCount > 0) {
+    const tag = await formatUserLabel(client, g.mvpWeekUserId);
+    mvpWeekLine = `**${tag}** — ${g.mvpWeekCount} message(s) cette semaine`;
+  }
 
   let mvpLine = "_Aucun MVP ce mois-ci._";
   if (g.mvpUserId && g.mvpCount > 0) {
@@ -162,7 +180,9 @@ async function handleAzeGlobal(interaction, client) {
     .addFields(
       { name: "Total historique (messages comptés)", value: String(g.totalAll) },
       { name: "Aujourd'hui", value: String(g.totalToday) },
+      { name: "Semaine en cours", value: String(g.totalWeek) },
       { name: "Mois en cours", value: String(g.totalMonth) },
+      { name: "MVP de la semaine", value: mvpWeekLine },
       { name: "MVP du mois", value: mvpLine },
     )
     .setTimestamp();

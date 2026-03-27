@@ -77,6 +77,22 @@ class AzeSessionManager {
   }
 
   /**
+   * On ne démarre / reset une session que si le message auto contient un ping
+   * (ex: ping d'un rôle @azebot).
+   * @param {import('discord.js').Message} message
+   * @returns {boolean}
+   * @private
+   */
+  _autoMessageHasPing(message) {
+    const m = message.mentions;
+    return Boolean(
+      m?.everyone ||
+        (m?.users && m.users.size > 0) ||
+        (m?.roles && m.roles.size > 0),
+    );
+  }
+
+  /**
    * @param {import('discord.js').Message} message
    */
   async onPossibleAzeMessage(message) {
@@ -91,7 +107,13 @@ class AzeSessionManager {
     if (!AUTO_BOT_USER_ID) return;
 
     if (message.author.id === AUTO_BOT_USER_ID) {
-      this.onAutoMessage(message);
+      if (this._autoMessageHasPing(message)) {
+        this.onAutoMessage(message);
+      } else {
+        console.log(
+          `[AzeBot] Message auto ignoré (pas de ping) · salon ${message.channel.id} · guilde ${message.guildId} · msg ${message.id}`,
+        );
+      }
       return;
     }
 

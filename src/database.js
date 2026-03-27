@@ -152,14 +152,24 @@ function getUserStats(guildId, userId) {
 }
 
 /**
- * Stats globales + MVP du mois (plus grand nombre de messages aze ce mois-ci)
+ * Stats globales + MVP du mois + MVP de la semaine
  * @param {string} guildId
  * @param {number} monthStartMs début du mois (UTC ou local — on utilise les ms passés)
  * @param {number} monthEndMs exclusif
+ * @param {number} weekStartMs
+ * @param {number} weekEndMs exclusif
  * @param {number} dayStartMs
  * @param {number} dayEndMs exclusif
  */
-function getGlobalStats(guildId, monthStartMs, monthEndMs, dayStartMs, dayEndMs) {
+function getGlobalStats(
+  guildId,
+  monthStartMs,
+  monthEndMs,
+  weekStartMs,
+  weekEndMs,
+  dayStartMs,
+  dayEndMs,
+) {
   const totalAll = db
     .prepare(`SELECT COUNT(*) AS c FROM aze_records WHERE guild_id = ?`)
     .get(guildId).c;
@@ -176,6 +186,12 @@ function getGlobalStats(guildId, monthStartMs, monthEndMs, dayStartMs, dayEndMs)
     )
     .get(guildId, monthStartMs, monthEndMs).c;
 
+  const totalWeek = db
+    .prepare(
+      `SELECT COUNT(*) AS c FROM aze_records WHERE guild_id = ? AND msg_ts >= ? AND msg_ts < ?`,
+    )
+    .get(guildId, weekStartMs, weekEndMs).c;
+
   const mvp = db
     .prepare(
       `
@@ -189,12 +205,28 @@ function getGlobalStats(guildId, monthStartMs, monthEndMs, dayStartMs, dayEndMs)
     )
     .get(guildId, monthStartMs, monthEndMs);
 
+  const mvpWeek = db
+    .prepare(
+      `
+    SELECT user_id, COUNT(*) AS cnt
+    FROM aze_records
+    WHERE guild_id = ? AND msg_ts >= ? AND msg_ts < ?
+    GROUP BY user_id
+    ORDER BY cnt DESC
+    LIMIT 1
+  `,
+    )
+    .get(guildId, weekStartMs, weekEndMs);
+
   return {
     totalAll,
     totalToday,
+    totalWeek,
     totalMonth,
     mvpUserId: mvp?.user_id ?? null,
     mvpCount: mvp?.cnt ?? 0,
+    mvpWeekUserId: mvpWeek?.user_id ?? null,
+    mvpWeekCount: mvpWeek?.cnt ?? 0,
   };
 }
 

@@ -83,10 +83,16 @@ function buildRecordsFromHistory(
     const ts = msg.createdTimestamp;
 
     if (msg.author.id === autoBotUserId) {
-      sessionActive = true;
-      sessionStartTs = ts;
-      lastAzeTs = 0;
-      seenUserIds.clear();
+      const m = msg.mentions;
+      const hasPing = Boolean(
+        m?.everyone || (m?.users && m.users.size > 0) || (m?.roles && m.roles.size > 0),
+      );
+      if (hasPing) {
+        sessionActive = true;
+        sessionStartTs = ts;
+        lastAzeTs = 0;
+        seenUserIds.clear();
+      }
       continue;
     }
 
